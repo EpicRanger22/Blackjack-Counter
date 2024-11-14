@@ -1,17 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>My Website</title>
-    <link rel="stylesheet" href="./style.css">
-    <link rel="icon" href="./favicon.ico" type="image/x-icon">
-  </head>
-  <body>
-    <main>
-        <h1>Welcome to My Website</h1>  
-    </main>
-    <script src="index.js"></script>
-  </body>
+    <title>Blackjack Point Counter</title>
+    <style>
+        .player { margin: 10px; }
+        .button { margin-left: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Blackjack Point Counter</h1>
+    <label for="pot">Total Pot: $<span id="pot">0</span></label><br><br>
+    <label for="startingAmount">Starting Amount per Player: $</label>
+    <input type="number" id="startingAmount" value="100"><br><br>
+
+    <div id="players"></div>
+
+    <button onclick="addPlayer()">Add Player</button>
+    <button onclick="removePlayer()">Remove Player</button>
+
+    <script>
+        let players = [];
+        let pot = 0;
+        let startingAmount = document.getElementById("startingAmount").value;
+
+        function updatePot() {
+            document.getElementById("pot").innerText = pot;
+        }
+
+        function addPlayer() {
+            const playerName = prompt("Enter player name:");
+            if (playerName) {
+                players.push({ name: playerName, balance: parseInt(startingAmount) });
+                renderPlayers();
+            }
+        }
+
+        function removePlayer() {
+            const playerName = prompt("Enter player name to remove:");
+            players = players.filter(player => player.name !== playerName);
+            renderPlayers();
+        }
+
+        function renderPlayers() {
+            const playersDiv = document.getElementById("players");
+            playersDiv.innerHTML = "";
+            players.forEach(player => {
+                const playerDiv = document.createElement("div");
+                playerDiv.classList.add("player");
+                playerDiv.innerHTML = `${player.name}: $${player.balance}
+                    <button class="button" onclick="updateResult('${player.name}', 'win')">Win</button>
+                    <button class="button" onclick="updateResult('${player.name}', 'lose')">Lose</button>
+                    <button class="button" onclick="updateResult('${player.name}', 'blackjack')">Blackjack</button>`;
+                playersDiv.appendChild(playerDiv);
+            });
+        }
+
+        function updateResult(playerName, result) {
+            const player = players.find(p => p.name === playerName);
+            let resultAmount = 0;
+            if (result === 'win') {
+                resultAmount = 50; // Example win amount
+            } else if (result === 'lose') {
+                resultAmount = -50; // Example lose amount
+            } else if (result === 'blackjack') {
+                resultAmount = 100; // Blackjack bonus
+            }
+
+            player.balance += resultAmount;
+            pot += resultAmount;
+            updatePot();
+            renderPlayers();
+        }
+    </script>
+</body>
 </html>
